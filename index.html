@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JBCOMM — Data Center & Fiber Infrastructure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Epilogue:wght@300;400;500&family=Inconsolata:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #F2F0EB;
+    --accent: #C8FF00;
+    --accent-dim: #a0cc00;
+    --mid: #1e1e1e;
+    --border: #2e2e2e;
+    --muted: #888;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Epilogue', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 3rem;
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s, background .3s;
+  }
+  nav.scrolled {
+    background: rgba(8,8,8,.92);
+    backdrop-filter: blur(12px);
+    border-color: var(--border);
+  }
+  .nav-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: .12em;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Inconsolata', monospace;
+    font-size: .8rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  .nav-cta {
+    font-family: 'Inconsolata', monospace;
+    font-size: .78rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--accent);
+    padding: .55rem 1.4rem;
+    text-decoration: none;
+    transition: background .2s;
+  }
+  .nav-cta:hover { background: var(--accent-dim); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 3rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 30%, rgba(200,255,0,.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(200,255,0,.03) 0%, transparent 55%);
+  }
+
+  .hero-tag {
+    font-family: 'Inconsolata', monospace;
+    font-size: .78rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp .6s .2s forwards;
+  }
+
+  .hero-headline {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(5rem, 14vw, 13rem);
+    line-height: .92;
+    letter-spacing: -.01em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp .7s .35s forwards;
+  }
+
+  .hero-headline em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(242,240,235,.5);
+  }
+
+  .hero-sub-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: 3rem;
+    gap: 2rem;
+    opacity: 0;
+    animation: fadeUp .6s .55s forwards;
+  }
+
+  .hero-desc {
+    max-width: 400px;
+    font-size: 1rem;
+    color: #aaa;
+    line-height: 1.7;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+  }
+
+  .stat-block { text-align: right; }
+  .stat-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Inconsolata', monospace;
+    font-size: .7rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: .2rem;
+  }
+
+  .scroll-line {
+    position: absolute;
+    bottom: 0; left: 3rem;
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--accent));
+    opacity: 0;
+    animation: fadeIn 1s 1s forwards;
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 8rem 3rem; }
+  .section-label {
+    font-family: 'Inconsolata', monospace;
+    font-size: .72rem;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3rem, 7vw, 6rem);
+    text-transform: uppercase;
+    line-height: .95;
+    margin-bottom: 3rem;
+  }
+
+  /* ── SERVICES ── */
+  #services {
+    border-top: 1px solid var(--border);
+  }
+
+  .services-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+    gap: 2rem;
+  }
+
+  .services-intro {
+    max-width: 340px;
+    color: #aaa;
+    font-size: .95rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .service-card {
+    background: var(--black);
+    padding: 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background .3s;
+    cursor: default;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--accent);
+    transition: width .4s ease;
+  }
+  .service-card:hover { background: #0f0f0f; }
+  .service-card:hover::before { width: 100%; }
+
+  .service-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 3.5rem;
+    color: var(--border);
+    line-height: 1;
+    margin-bottom: 1rem;
+    transition: color .3s;
+  }
+  .service-card:hover .service-num { color: #2a2a2a; }
+
+  .service-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .75rem;
+  }
+
+  .service-desc {
+    font-size: .875rem;
+    color: #999;
+    line-height: 1.65;
+  }
+
+  /* ── ABOUT ── */
+  #about {
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .about-right { position: relative; }
+
+  .about-text {
+    font-size: 1.1rem;
+    color: #aaa;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+  }
+
+  .about-text strong {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .about-accent-block {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem;
+    margin: 2.5rem 0;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    line-height: 1.3;
+    color: var(--white);
+  }
+
+  .about-visual {
+    aspect-ratio: 4/5;
+    background: var(--mid);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .about-visual-inner {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 10rem;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--border);
+    letter-spacing: -.02em;
+    user-select: none;
+    opacity: .5;
+  }
+
+  .about-badge {
+    position: absolute;
+    bottom: 2rem; right: 2rem;
+    background: var(--accent);
+    color: var(--black);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    padding: .75rem 1.25rem;
+  }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials {
+    border-top: 1px solid var(--border);
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 1rem;
+  }
+
+  .testimonial {
+    background: var(--black);
+    padding: 2.5rem 2rem;
+    position: relative;
+  }
+
+  .testimonial-quote {
+    font-size: .95rem;
+    color: #aaa;
+    line-height: 1.75;
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  .testimonial-quote::before {
+    content: '"';
+    display: block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 4rem;
+    color: var(--accent);
+    line-height: .8;
+    margin-bottom: 1rem;
+  }
+
+  .testimonial-author {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+  }
+
+  .testimonial-company {
+    font-family: 'Inconsolata', monospace;
+    font-size: .72rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: .25rem;
+  }
+
+  /* ── CONTACT ── */
+  #contact {
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+
+  .contact-info { padding-top: .5rem; }
+
+  .contact-detail {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2rem;
+  }
+
+  .contact-detail-label {
+    font-family: 'Inconsolata', monospace;
+    font-size: .7rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .3rem;
+  }
+
+  .contact-detail-value {
+    font-size: 1.1rem;
+    color: var(--white);
+  }
+
+  .contact-detail-value a {
+    color: var(--white);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    transition: border-color .2s, color .2s;
+  }
+  .contact-detail-value a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+
+  .form-field { display: flex; flex-direction: column; gap: .4rem; }
+
+  .form-field label {
+    font-family: 'Inconsolata', monospace;
+    font-size: .7rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    background: var(--mid);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: .85rem 1rem;
+    font-family: 'Epilogue', sans-serif;
+    font-size: .9rem;
+    outline: none;
+    transition: border-color .2s;
+    width: 100%;
+    resize: none;
+    -webkit-appearance: none;
+  }
+  .form-field input:focus,
+  .form-field textarea:focus,
+  .form-field select:focus {
+    border-color: var(--accent);
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .btn-submit {
+    background: var(--accent);
+    color: var(--black);
+    border: none;
+    padding: 1rem 2rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    align-self: flex-start;
+    margin-top: .5rem;
+  }
+  .btn-submit:hover { background: var(--accent-dim); }
+  .btn-submit:active { transform: scale(.98); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: .12em;
+    color: var(--white);
+  }
+  .footer-logo span { color: var(--accent); }
+
+  .footer-copy {
+    font-family: 'Inconsolata', monospace;
+    font-size: .7rem;
+    letter-spacing: .1em;
+    color: var(--muted);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* ── REVEAL ON SCROLL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .65s ease, transform .65s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    #hero { padding: 0 1.5rem 4rem; }
+    section { padding: 5rem 1.5rem; }
+    .services-grid,
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .services-header { flex-direction: column; align-items: flex-start; }
+    #about { grid-template-columns: 1fr; gap: 3rem; }
+    .about-visual { display: none; }
+    #contact { grid-template-columns: 1fr; gap: 3rem; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .hero-sub-row { flex-direction: column; align-items: flex-start; }
+    .hero-stats { justify-content: flex-start; }
+    .stat-block { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">JB<span>COMM</span></a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#testimonials">Clients</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get Started</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-tag">Saint Louis, MO &nbsp;·&nbsp; Data Center &amp; Fiber Infrastructure</div>
+  <h1 class="hero-headline">
+    Built<br>
+    <em>From</em><br>
+    The Core.
+  </h1>
+  <div class="hero-sub-row">
+    <p class="hero-desc">
+      JBCOMM specializes in data center buildouts, certified fiber installations, and structured cabling — precision work for infrastructure that cannot fail.
+    </p>
+    <div class="hero-stats">
+      <div class="stat-block">
+        <div class="stat-num">BICSI</div>
+        <div class="stat-label">Trained</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-num">FLUKE</div>
+        <div class="stat-label">Certified Testing</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-line"></div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header reveal">
+    <div>
+      <div class="section-label">What We Do</div>
+      <h2 class="section-title" style="margin-bottom:0">Services</h2>
+    </div>
+    <p class="services-intro">
+      End-to-end infrastructure work — from fiber certification and structured cabling to full advanced configuration of servers, storage, network, and complete pod deployments.
+    </p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-num">01</div>
+      <div class="service-name">Fiber Certification &amp; Testing</div>
+      <p class="service-desc">End-to-end fiber qualification using Fluke DSX and CFP testing platforms. OLTS, OTDR, and full tier-1/tier-2 certification with printed pass/fail reports delivered on every job.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">02</div>
+      <div class="service-name">Data Center Cabling</div>
+      <p class="service-desc">Structured cabling within data center environments — copper and fiber runs, patch panel terminations, cable management, and full certification. We work inside existing or new DC spaces.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">03</div>
+      <div class="service-name">Structured Cabling</div>
+      <p class="service-desc">Cat6A, Cat6, OS2 single-mode, and OM4 multimode installations. Every run labeled, tested, and certified to TIA-568 standards.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">04</div>
+      <div class="service-name">Rack &amp; Stack</div>
+      <p class="service-desc">Cabinet installation populated or empty, equipment mounting, cable dressing, patch panel terminations, and fiber connectivity. We also handle initial device configuration post-mount — so gear ships staged and ready.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">05</div>
+      <div class="service-name">OSP / Campus Fiber</div>
+      <p class="service-desc">Outside plant fiber scoping and coordination — we work with and can arrange qualified OSP contractors for underground, aerial, and campus runs while maintaining accountability on your project.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-num">06</div>
+      <div class="service-name">Custom Configuration &amp; Commissioning</div>
+      <p class="service-desc">Available as a standalone engagement or added to any project. Purpose-built configuration across the full infrastructure stack — network switches, routers, firewalls, servers, storage, and security appliances. Script-based and runbook-driven for consistency and repeatability. Every device commissioned to spec, documented, and handed off ready to run.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-left">
+    <div class="section-label reveal">Who We Are</div>
+    <h2 class="section-title reveal">About<br>JBCOMM</h2>
+    <p class="about-text reveal">
+      JBCOMM, LLC is a Saint Louis–based infrastructure contractor specializing in <strong>data center projects and certified fiber installations</strong> — the kind of work where documentation and precision aren't optional.
+    </p>
+    <div class="about-accent-block reveal">
+      Every link tested.<br>Every device configured.<br>No exceptions.
+    </div>
+    <p class="about-text reveal">
+      Armed with Fluke certification-grade test equipment, JBCOMM delivers <strong>tier-1 and tier-2 fiber certification</strong> with full OLTS and OTDR reports on every job — and the technical depth to configure everything above the physical layer too. Servers, storage, network gear, appliances, full pods — script-based and runbook-driven for consistent, repeatable results.
+    </p>
+    <p class="about-text reveal">
+      As a lean, single-point-of-contact operation, you deal directly with the person doing the work — no subcontracting chains, no markups on expertise.
+    </p>
+  </div>
+  <div class="about-right reveal">
+    <div class="about-visual">
+      <div class="about-visual-inner">JB</div>
+      <div class="about-badge">STL Based</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="reveal">
+    <div class="section-label">Client Feedback</div>
+    <h2 class="section-title">What They<br>Say</h2>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial reveal">
+      <p class="testimonial-quote">
+        JBCOMM delivered full tier-2 OTDR certification reports on every fiber run. Clean installs, clean docs — exactly what we needed to hand off to the client.
+      </p>
+      <div class="testimonial-author">Project Manager</div>
+      <div class="testimonial-company">General Contractor · Commercial DC Project</div>
+    </div>
+    <div class="testimonial reveal">
+      <p class="testimonial-quote">
+        The cabling in our new server room is the cleanest we've ever had. Labeled, tested, certified. JBCOMM takes that stuff seriously.
+      </p>
+      <div class="testimonial-author">IT Director</div>
+      <div class="testimonial-company">Regional Healthcare Network</div>
+    </div>
+    <div class="testimonial reveal">
+      <p class="testimonial-quote">
+        We brought JBCOMM in mid-project when our fiber runs failed certification. They re-terminated, re-tested, and had passing reports in hand by end of day.
+      </p>
+      <div class="testimonial-author">Lead Engineer</div>
+      <div class="testimonial-company">Systems Integrator · STL Metro</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-info">
+    <div class="section-label reveal">Reach Out</div>
+    <h2 class="section-title reveal">Let's<br>Talk</h2>
+    <div class="contact-detail reveal">
+      <span class="contact-detail-label">Email</span>
+      <span class="contact-detail-value">
+        <a href="mailto:hello@jbcomm.biz">hello@jbcomm.biz</a>
+      </span>
+    </div>
+    <div class="contact-detail reveal">
+      <span class="contact-detail-label">Phone</span>
+      <span class="contact-detail-value">
+        <a href="tel:+13145550000">(314) 555-0000</a>
+      </span>
+    </div>
+    <div class="contact-detail reveal">
+      <span class="contact-detail-label">Location</span>
+      <span class="contact-detail-value">Saint Louis, MO</span>
+    </div>
+    <div class="contact-detail reveal">
+      <span class="contact-detail-label">Response Time</span>
+      <span class="contact-detail-value">Within 2 business hours</span>
+    </div>
+  </div>
+  <div class="contact-form reveal">
+    <div class="form-row">
+      <div class="form-field">
+        <label>First Name</label>
+        <input type="text" placeholder="Jane">
+      </div>
+      <div class="form-field">
+        <label>Last Name</label>
+        <input type="text" placeholder="Smith">
+      </div>
+    </div>
+    <div class="form-field">
+      <label>Company</label>
+      <input type="text" placeholder="Your Company">
+    </div>
+    <div class="form-field">
+      <label>Email</label>
+      <input type="email" placeholder="jane@company.com">
+    </div>
+    <div class="form-field">
+      <label>Service Needed</label>
+      <select>
+        <option value="" disabled selected>Select a service...</option>
+        <option>Fiber Certification &amp; Testing</option>
+        <option>Data Center Cabling</option>
+        <option>Structured Cabling</option>
+        <option>Rack &amp; Stack</option>
+        <option>OSP / Campus Fiber</option>
+        <option>Custom Configuration &amp; Commissioning</option>
+        <option>General Inquiry</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Message</label>
+      <textarea rows="5" placeholder="Tell us about your project — fiber runs, DC buildout scope, certification requirements, timeline..."></textarea>
+    </div>
+    <button class="btn-submit">Send Message →</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">JB<span>COMM</span>, LLC</div>
+  <div class="footer-copy">© 2025 JBCOMM, LLC · Saint Louis, MO · jbcomm.biz</div>
+</footer>
+
+<script>
+  // Nav scroll state
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Stagger grid children
+  document.querySelectorAll('.services-grid .service-card, .testimonials-grid .testimonial').forEach((el, i) => {
+    el.style.transitionDelay = `${(i % 3) * 80}ms`;
+  });
+</script>
+</body>
+</html>
