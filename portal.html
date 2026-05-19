@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JBCOMM — Job Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Epilogue:wght@300;400;500&family=Inconsolata:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #080808;
+    color: #F2F0EB;
+    font-family: 'Epilogue', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+  :root {
+    --black: #080808;
+    --white: #F2F0EB;
+    --accent: #C8FF00;
+    --mid: #1a1a1a;
+    --border: #222;
+    --muted: #555;
+  }
+
+  /* HEADER */
+  #header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    background: rgba(8,8,8,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 0.12em;
+    color: var(--white);
+  }
+  .logo span { color: var(--accent); }
+  .logo-sub {
+    color: #333;
+    font-family: 'Inconsolata', monospace;
+    font-weight: 400;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    margin-left: 0.5rem;
+  }
+  .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+  /* MODE TOGGLE */
+  .mode-toggle {
+    display: flex;
+    gap: 4px;
+    background: #111;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px;
+  }
+  .mode-btn {
+    background: transparent;
+    color: #666;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Inconsolata', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .mode-btn.active {
+    background: var(--accent);
+    color: var(--black);
+    font-weight: 700;
+  }
+
+  /* BUTTONS */
+  .btn-primary {
+    background: var(--accent);
+    color: var(--black);
+    border: none;
+    padding: 10px 24px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: #a0cc00; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary {
+    background: transparent;
+    color: #888;
+    border: 1px solid #333;
+    padding: 8px 20px;
+    font-family: 'Inconsolata', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-secondary:hover { border-color: #555; color: var(--white); }
+
+  /* MAIN */
+  .main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  .page-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    text-transform: uppercase;
+    line-height: 0.95;
+    margin-bottom: 2rem;
+  }
+  .page-title .accent { color: var(--accent); }
+  .section-label {
+    font-family: 'Inconsolata', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: #0f0f0f;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+  }
+  .stat-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Inconsolata', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* FILTERS */
+  .filter-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'Inconsolata', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: #1a1a1a;
+    border-color: #444;
+    color: var(--white);
+  }
+
+  /* JOB CARDS */
+  .job-card {
+    background: #0f0f0f;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .job-card:hover { border-color: #444; }
+  .job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+  .job-client {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .job-site { color: #555; font-size: 0.85rem; margin-top: 2px; }
+  .job-meta { display: flex; gap: 2rem; flex-wrap: wrap; }
+  .job-meta-item {}
+  .job-meta-label {
+    font-family: 'Inconsolata', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #444;
+  }
+  .job-meta-value { font-size: 0.82rem; color: #888; margin-top: 2px; }
+
+  /* STATUS BADGE */
+  .status-badge {
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-family: 'Inconsolata', monospace;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* FORM */
+  .form { display: flex; flex-direction: column; gap: 1.25rem; max-width: 680px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .field-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field-label {
+    font-family: 'Inconsolata', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #666;
+  }
+  input, textarea, select {
+    background: #1a1a1a;
+    border: 1px solid #2e2e2e;
+    color: var(--white);
+    padding: 10px 14px;
+    font-family: 'Epilogue', sans-serif;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 80px; }
+  .form-actions { display: flex; gap: 1rem; align-items: center; }
+
+  /* JOB DETAIL */
+  .job-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2rem;
+    align-items: start;
+  }
+  .detail-section {
+    background: #0f0f0f;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .detail-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #111;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label {
+    font-family: 'Inconsolata', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 2px;
+  }
+  .detail-value { font-size: 0.9rem; color: #ccc; }
+
+  /* STATUS BUTTONS */
+  .status-btns { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+  .status-update-btn {
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Inconsolata', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 8px 14px;
+    transition: all 0.15s;
+  }
+
+  /* HISTORY */
+  .history-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #111;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .history-note { font-size: 0.8rem; color: #ccc; }
+  .history-ts {
+    font-size: 0.72rem;
+    color: #444;
+    margin-top: 2px;
+    font-family: 'Inconsolata', monospace;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 4rem;
+  }
+  .empty-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: #1a1a1a;
+  }
+  .empty-sub {
+    font-family: 'Inconsolata', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: #333;
+    margin-top: 0.5rem;
+  }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    #header { padding: 0 1rem; }
+    .main { padding: 1.5rem 1rem; }
+    .form-row { grid-template-columns: 1fr; }
+    .job-detail-grid { grid-template-columns: 1fr; }
+    .logo-sub { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">JB<span>COMM</span><span class="logo-sub">JOB PORTAL</span></div>
+  <div class="header-actions">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="adminModeBtn" onclick="setMode('admin')">Admin</button>
+      <button class="mode-btn" id="clientModeBtn" onclick="setMode('client')">Client</button>
+    </div>
+    <button class="btn-primary" id="newJobBtn" onclick="showView('new_job')">+ New Job</button>
+    <button class="btn-secondary" id="backBtn" style="display:none" onclick="goBack()">← Back</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
+  <div class="main">
+    <div class="page-title">Job<br><span class="accent">Dashboard</span></div>
+    <div class="stats-row" id="statsRow"></div>
+    <div class="filter-row" id="filterRow"></div>
+    <div id="jobList"></div>
+  </div>
+</div>
+
+<!-- NEW JOB -->
+<div id="view-new_job" class="view">
+  <div class="main">
+    <div class="page-title" id="newJobTitle">New<br><span class="accent">Job</span></div>
+    <form class="form" id="jobForm" onsubmit="submitJob(event)">
+      <div class="section-label" id="formSection1">Client &amp; Site</div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Company *</label>
+          <input name="client" required placeholder="Acme Corp">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Site Name</label>
+          <input name="site_name" placeholder="Data Center A">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Site Address *</label>
+        <input name="site_address" required placeholder="123 Main St, St Louis MO 63101">
+      </div>
+      <div class="section-label">On-Site Contact</div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Contact Name *</label>
+          <input name="contact_name" required>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Phone *</label>
+          <input name="contact_phone" required>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Contact Email</label>
+        <input type="email" name="contact_email">
+      </div>
+      <div class="section-label">Job Details</div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Service Type *</label>
+          <select name="service_type" required>
+            <option value="">Select a service...</option>
+            <option>Fiber Certification &amp; Testing</option>
+            <option>Data Center Cabling</option>
+            <option>Structured Cabling</option>
+            <option>Rack &amp; Stack</option>
+            <option>OSP / Campus Fiber</option>
+            <option>Custom Configuration &amp; Commissioning</option>
+            <option>Network Infrastructure</option>
+            <option>General / Mixed Scope</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Scheduled Date</label>
+          <input type="date" name="scheduled_date">
+        </div>
+      </div>
+      <div class="field-group" id="techsField">
+        <label class="field-label">Assigned Techs</label>
+        <input name="techs" placeholder="John B., Tech 2...">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Scope of Work *</label>
+        <textarea name="scope" required rows="4" placeholder="Describe the work to be performed..."></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Equipment List</label>
+        <textarea name="equipment_list" rows="3" placeholder="Switches, servers, fiber runs, patch panels..."></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Special Requirements / Access Notes</label>
+        <textarea name="special_requirements" rows="3" placeholder="Badging, escort, safety gear, parking..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" id="submitBtn">Submit Job Request →</button>
+        <button type="button" class="btn-secondary" id="cancelFormBtn" onclick="goBack()" style="display:none">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JOB DETAIL -->
+<div id="view-job_detail" class="view">
+  <div class="main" id="jobDetailContent"></div>
+</div>
+
+<script>
+const STATUSES = [
+  { key: "intake",       label: "Intake",        color: "#888888" },
+  { key: "scheduled",    label: "Scheduled",     color: "#4A90D9" },
+  { key: "in_progress",  label: "In Progress",   color: "#F5A623" },
+  { key: "pending_cert", label: "Pending Cert",  color: "#9B59B6" },
+  { key: "complete",     label: "Complete",      color: "#C8FF00" },
+  { key: "invoiced",     label: "Invoiced",      color: "#2ECC71" },
+];
+
+let jobs = [];
+let currentView = "dashboard";
+let currentMode = "admin";
+let selectedJobId = null;
+let currentFilter = "all";
+
+// Storage
+function loadJobs() {
+  try {
+    const raw = localStorage.getItem("jbcomm_jobs");
+    if (raw) jobs = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function saveJobs() {
+  try {
+    localStorage.setItem("jbcomm_jobs", JSON.stringify(jobs));
+  } catch(e) {}
+}
+
+function generateId() {
+  return "JB-" + Date.now().toString(36).toUpperCase();
+}
+
+function formatDate(str) {
+  if (!str) return "—";
+  const d = new Date(str + "T12:00:00");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function getStatus(key) {
+  return STATUSES.find(s => s.key === key) || STATUSES[0];
+}
+
+function statusBadgeHTML(status) {
+  const s = getStatus(status);
+  return `<span class="status-badge" style="background:${s.color}22;color:${s.color};border:1px solid ${s.color}44">${s.label}</span>`;
+}
+
+// Views
+function showView(view) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view-" + view).classList.add("active");
+  currentView = view;
+  updateHeader();
+  if (view === "dashboard") renderDashboard();
+  if (view === "job_detail") renderJobDetail();
+}
+
+function goBack() {
+  showView("dashboard");
+}
+
+function updateHeader() {
+  const newJobBtn = document.getElementById("newJobBtn");
+  const backBtn = document.getElementById("backBtn");
+  const cancelFormBtn = document.getElementById("cancelFormBtn");
+
+  if (currentView === "dashboard") {
+    newJobBtn.style.display = currentMode === "admin" ? "block" : "none";
+    backBtn.style.display = "none";
+  } else {
+    newJobBtn.style.display = "none";
+    backBtn.style.display = "block";
+    if (cancelFormBtn) cancelFormBtn.style.display = currentMode === "admin" ? "block" : "none";
+  }
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById("adminModeBtn").classList.toggle("active", mode === "admin");
+  document.getElementById("clientModeBtn").classList.toggle("active", mode === "client");
+
+  // Show/hide admin-only fields
+  const techsField = document.getElementById("techsField");
+  if (techsField) techsField.style.display = mode === "admin" ? "flex" : "none";
+
+  const newJobTitle = document.getElementById("newJobTitle");
+  if (newJobTitle) newJobTitle.innerHTML = mode === "client"
+    ? 'Submit a<br><span class="accent">Job Request</span>'
+    : 'New<br><span class="accent">Job</span>';
+
+  const submitBtn = document.getElementById("submitBtn");
+  if (submitBtn) submitBtn.textContent = mode === "client" ? "Submit Job Request →" : "Create Job →";
+
+  if (currentView === "dashboard") {
+    if (mode === "client") showView("new_job");
+    else renderDashboard();
+  }
+  updateHeader();
+}
+
+// Dashboard
+function renderDashboard() {
+  renderStats();
+  renderFilters();
+  renderJobList();
+}
+
+function renderStats() {
+  const counts = {};
+  STATUSES.forEach(s => counts[s.key] = jobs.filter(j => j.status === s.key).length);
+  const showKeys = ["in_progress", "scheduled", "pending_cert", "complete"];
+
+  document.getElementById("statsRow").innerHTML = `
+    <div class="stat-card">
+      <div class="stat-num">${jobs.length}</div>
+      <div class="stat-label">Total Jobs</div>
+    </div>
+    ${STATUSES.filter(s => showKeys.includes(s.key)).map(s => `
+      <div class="stat-card">
+        <div class="stat-num" style="color:${s.color}">${counts[s.key] || 0}</div>
+        <div class="stat-label">${s.label}</div>
+      </div>
+    `).join("")}
+  `;
+}
+
+function renderFilters() {
+  const counts = {};
+  STATUSES.forEach(s => counts[s.key] = jobs.filter(j => j.status === s.key).length);
+
+  document.getElementById("filterRow").innerHTML = `
+    <button class="filter-btn ${currentFilter === "all" ? "active" : ""}" onclick="setFilter('all')">All (${jobs.length})</button>
+    ${STATUSES.map(s => `
+      <button class="filter-btn ${currentFilter === s.key ? "active" : ""}" onclick="setFilter('${s.key}')">${s.label} (${counts[s.key] || 0})</button>
+    `).join("")}
+  `;
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  renderFilters();
+  renderJobList();
+}
+
+function renderJobList() {
+  const filtered = currentFilter === "all" ? jobs : jobs.filter(j => j.status === currentFilter);
+  if (filtered.length === 0) {
+    document.getElementById("jobList").innerHTML = `
+      <div class="empty-state">
+        <div class="empty-title">NO JOBS</div>
+        <div class="empty-sub">${currentFilter === "all" ? "CREATE YOUR FIRST JOB ABOVE" : "NO JOBS WITH THIS STATUS"}</div>
+      </div>
+    `;
+    return;
+  }
+  document.getElementById("jobList").innerHTML = filtered.map(job => `
+    <div class="job-card" onclick="openJob('${job.id}')">
+      <div class="job-card-header">
+        <div>
+          <div class="job-client">${job.client}</div>
+          <div class="job-site">${job.site_name || job.site_address || ""}</div>
+        </div>
+        ${statusBadgeHTML(job.status)}
+      </div>
+      <div class="job-meta">
+        <div class="job-meta-item">
+          <div class="job-meta-label">Service</div>
+          <div class="job-meta-value">${job.service_type || "—"}</div>
+        </div>
+        <div class="job-meta-item">
+          <div class="job-meta-label">Date</div>
+          <div class="job-meta-value">${formatDate(job.scheduled_date)}</div>
+        </div>
+        <div class="job-meta-item">
+          <div class="job-meta-label">Techs</div>
+          <div class="job-meta-value">${job.techs || "Unassigned"}</div>
+        </div>
+        <div class="job-meta-item">
+          <div class="job-meta-label">ID</div>
+          <div class="job-meta-value">${job.id}</div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function openJob(id) {
+  selectedJobId = id;
+  showView("job_detail");
+}
+
+// Job Detail
+function renderJobDetail() {
+  const job = jobs.find(j => j.id === selectedJobId);
+  if (!job) return;
+  const s = getStatus(job.status);
+
+  document.getElementById("jobDetailContent").innerHTML = `
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;flex-wrap:wrap">
+      <div class="page-title" style="margin-bottom:0;font-size:clamp(1.5rem,4vw,2.5rem)">${job.client}</div>
+      ${statusBadgeHTML(job.status)}
+    </div>
+    <div class="job-detail-grid">
+      <div>
+        <div class="detail-section">
+          <div class="section-label">Site &amp; Contact</div>
+          ${[
+            ["Site", job.site_name || "—"],
+            ["Address", job.site_address],
+            ["Contact", job.contact_name],
+            ["Phone", job.contact_phone],
+            ["Email", job.contact_email || "—"],
+          ].map(([l,v]) => `
+            <div class="detail-row">
+              <div class="detail-label">${l}</div>
+              <div class="detail-value">${v}</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="detail-section">
+          <div class="section-label">Job Info</div>
+          ${[
+            ["Service", job.service_type],
+            ["Scheduled", formatDate(job.scheduled_date)],
+            ["Techs", job.techs || "Unassigned"],
+            ["Job ID", job.id],
+            ["Created", formatDate(job.created_at)],
+          ].map(([l,v]) => `
+            <div class="detail-row">
+              <div class="detail-label">${l}</div>
+              <div class="detail-value">${v}</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="detail-section">
+          <div class="section-label">Scope</div>
+          <p style="color:#aaa;font-size:0.9rem;line-height:1.7">${job.scope}</p>
+          ${job.equipment_list ? `
+            <div class="section-label" style="margin-top:1rem">Equipment</div>
+            <p style="color:#aaa;font-size:0.9rem;line-height:1.7">${job.equipment_list}</p>
+          ` : ""}
+          ${job.special_requirements ? `
+            <div class="section-label" style="margin-top:1rem">Special Requirements</div>
+            <p style="color:#aaa;font-size:0.9rem;line-height:1.7">${job.special_requirements}</p>
+          ` : ""}
+        </div>
+      </div>
+      <div>
+        <div class="detail-section" id="statusPanel">
+          <div class="section-label">Update Status</div>
+          <div class="status-btns">
+            ${STATUSES.map(st => `
+              <button class="status-update-btn" onclick="updateStatus('${job.id}','${st.key}')"
+                style="background:${job.status===st.key ? st.color+'22' : 'transparent'};
+                       border:1px solid ${job.status===st.key ? st.color : '#222'};
+                       color:${job.status===st.key ? st.color : '#555'}">
+                ${job.status===st.key ? "● " : "○ "}${st.label}
+              </button>
+            `).join("")}
+          </div>
+          <div class="field-group">
+            <label class="field-label">Update Note</label>
+            <textarea id="statusNote" rows="3" placeholder="Add note for client..." style="min-height:60px"></textarea>
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="section-label">History</div>
+          ${[...(job.history||[])].reverse().map(h => `
+            <div class="history-item">
+              <div class="history-dot"></div>
+              <div>
+                <div class="history-note">${h.note}</div>
+                <div class="history-ts">${new Date(h.ts).toLocaleString()}</div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Hide status panel for client mode
+  const statusPanel = document.getElementById("statusPanel");
+  if (statusPanel) statusPanel.style.display = currentMode === "client" ? "none" : "block";
+}
+
+function updateStatus(jobId, newStatus) {
+  const note = document.getElementById("statusNote")?.value || `Status updated to ${getStatus(newStatus).label}`;
+  jobs = jobs.map(j => {
+    if (j.id !== jobId) return j;
+    return {
+      ...j,
+      status: newStatus,
+      updated_at: new Date().toISOString(),
+      history: [...(j.history||[]), { status: newStatus, note, ts: new Date().toISOString() }]
+    };
+  });
+  saveJobs();
+  renderJobDetail();
+}
+
+// Form submit
+function submitJob(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = Object.fromEntries(new FormData(form));
+  const newJob = {
+    ...data,
+    id: generateId(),
+    status: "intake",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    history: [{ status: "intake", note: "Job created", ts: new Date().toISOString() }]
+  };
+  jobs = [newJob, ...jobs];
+  saveJobs();
+  form.reset();
+  const btn = document.getElementById("submitBtn");
+  btn.textContent = "✓ Submitted";
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = currentMode === "client" ? "Submit Job Request →" : "Create Job →";
+    btn.disabled = false;
+    if (currentMode === "admin") showView("dashboard");
+    else {
+      document.querySelector(".main").scrollTo(0,0);
+    }
+  }, 1500);
+}
+
+// Init
+loadJobs();
+renderDashboard();
+</script>
+</body>
+</html>
