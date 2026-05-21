@@ -727,43 +727,20 @@
       <span class="contact-detail-value">Within 2 business hours</span>
     </div>
   </div>
-  <div class="contact-form reveal"><form id="contactForm" action="https://formspree.io/f/xwvzolkl" method="POST">
+    <div class="contact-form reveal">
+    <form id="contactForm" action="https://formspree.io/f/xwvzolkl" method="POST">
     <div class="form-row">
-      <div class="form-field">
-        <label>First Name</label>
-        <input type="text" placeholder="Jane">
-      </div>
-      <div class="form-field">
-        <label>Last Name</label>
-        <input type="text" placeholder="Smith">
-      </div>
+      <div class="form-field"><label>First Name</label><input type="text" name="first_name" placeholder="Jane" required></div>
+      <div class="form-field"><label>Last Name</label><input type="text" name="last_name" placeholder="Smith" required></div>
     </div>
-    <div class="form-field">
-      <label>Company</label>
-      <input type="text" placeholder="Your Company">
-    </div>
-    <div class="form-field">
-      <label>Email</label>
-      <input type="email" placeholder="jane@company.com">
-    </div>
-    <div class="form-field">
-      <label>Service Needed</label>
-      <select>
-        <option value="" disabled selected>Select a service...</option>
-        <option>Fiber Certification &amp; Testing</option>
-        <option>Data Center Cabling</option>
-        <option>Structured Cabling</option>
-        <option>Rack &amp; Stack</option>
-        <option>OSP / Campus Fiber</option>
-        <option>Custom Configuration &amp; Commissioning</option>
-        <option>General Inquiry</option>
-      </select>
-    </div>
-    <div class="form-field">
-      <label>Message</label>
-      <textarea rows="5" placeholder="Tell us about your project — fiber runs, DC buildout scope, certification requirements, timeline..."></textarea>
-    </div>
-    <button class="btn-submit">Send Message →</button>
+    <div class="form-field"><label>Company</label><input type="text" name="company" placeholder="Your Company"></div>
+    <div class="form-field"><label>Email</label><input type="email" name="email" placeholder="jane@company.com" required></div>
+    <div class="form-field"><label>Phone</label><input type="tel" name="phone" placeholder="(314) 467-0314"></div>
+    <div class="form-field"><label>Service Needed</label><select name="service"><option value="" disabled selected>Select a service...</option><option>Fiber Certification &amp; Testing</option><option>Data Center Cabling</option><option>Structured Cabling</option><option>Rack &amp; Stack</option><option>OSP / Campus Fiber</option><option>Custom Configuration &amp; Commissioning</option><option>General Inquiry</option></select></div>
+    <div class="form-field"><label>Message</label><textarea rows="5" name="message" placeholder="Tell us about your project..." required></textarea></div>
+    <input type="hidden" name="_subject" value="New JBCOMM Inquiry">
+    <button type="submit" class="btn-submit" id="submitBtn">Send Message</button>
+    </form>
   </div>
 </section>
 
@@ -799,3 +776,4 @@
 </script>
 </body>
 </html>
+
